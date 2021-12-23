@@ -19,8 +19,20 @@ if len(sys.argv) != 2:
     print(usage)
     sys.exit()
 
+# check if the input Markdown file is in current folder
 mdfile = sys.argv[1]
 print('Converting %s to AGU format' % mdfile)
+
+fn = os.path.basename(mdfile)
+if os.path.abspath(fn) != os.path.abspath(mdfile):
+    print((' Error: The Markdown file should be in '
+        'the current directory %s') % os.getcwd())
+    sys.exit()
+
+fn_name, fn_ext = os.path.splitext(fn)
+
+pdf_fn = fn_name + '.pdf'
+docx_fn = fn_name + '.docx'
 
 shutil.copy(pkg_file('data/agujournal2019.cls'), os.getcwd())
 shutil.copy(pkg_file('data/trackchanges.sty'), os.getcwd())
@@ -29,7 +41,7 @@ shutil.copy(pkg_file('data/agutemplate.tex'), os.getcwd())
 shutil.copy(pkg_file('data/agu-reference.docx'), os.getcwd())
 
 call(("pandoc %s --template=%s "
-    "--pdf-engine=xelatex --o test.pdf") % (mdfile, 'agutemplate.tex'),
+    "--pdf-engine=xelatex --o %s") % (mdfile, 'agutemplate.tex', pdf_fn),
     shell=True)
 
 call(("pandoc %s --template=%s "
@@ -38,6 +50,6 @@ call(("pandoc %s --template=%s "
 
 call(("pandoc test_docx.tex "
     "--reference-doc=%s "
-    "-o test.docx") % 'agu-reference.docx', shell=True)
+    "-o %s") % ('agu-reference.docx', docx_fn), shell=True)
 
 call("rm test_docx.tex", shell=True)
