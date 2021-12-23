@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+#-*-coding:utf-8-*-
+
+import os
+import sys
+import shutil
+from subprocess import call
+
+import pkg_resources
+def pkg_file(fn):
+    return pkg_resources.resource_filename('pandoc_agutemplate', fn)
+
+usage = '''md2agu - Convert Markdown files to AGU journal's format
+  Usage: md2agu manuscript.md
+'''
+
+if len(sys.argv) != 2:
+    print(' Error: One and only one Markdown file should be given')
+    print(usage)
+    sys.exit()
+
+mdfile = sys.argv[1]
+print('Converting %s to AGU format' % mdfile)
+
+shutil.copy(pkg_file('data/agujournal2019.cls'), os.getcwd())
+shutil.copy(pkg_file('data/trackchanges.sty'), os.getcwd())
+shutil.copy(pkg_file('data/agu-docx.tex'), os.getcwd())
+shutil.copy(pkg_file('data/agutemplate.tex'), os.getcwd())
+shutil.copy(pkg_file('data/agu-reference.docx'), os.getcwd())
+
+call(("pandoc %s --template=%s "
+    "--pdf-engine=xelatex --o test.pdf") % (mdfile, 'agutemplate.tex'),
+    shell=True)
+
+call(("pandoc %s --template=%s "
+    "-o test_docx.tex") % (mdfile, 'agu-docx.tex'),
+    shell=True)
+
+call(("pandoc test_docx.tex "
+    "--reference-doc=%s "
+    "-o test.docx") % 'agu-reference.docx', shell=True)
+
+call("rm test_docx.tex", shell=True)

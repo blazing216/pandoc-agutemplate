@@ -1,0 +1,134 @@
+\PassOptionsToPackage{unicode=true$for(hyperrefoptions)$,$hyperrefoptions$$endfor$}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+$if(colorlinks)$
+\PassOptionsToPackage{dvipsnames,svgnames*,x11names*}{xcolor}
+$endif$
+$if(dir)$
+$if(latex-dir-rtl)$
+\PassOptionsToPackage{RTLdocument}{bidi}
+$endif$
+$endif$
+\documentclass[draft]{agujournal2019}
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\usepackage{url} %this package should fix any errors with URLs in refs.
+\usepackage{lineno}
+\usepackage[inline]{trackchanges} %for better track changes. finalnew option will compile document with changes incorporated.
+\usepackage{soul}
+\linenumbers
+
+\def\tightlist{}
+
+\draftfalse
+
+$if(journal)$
+\journalname{$journal$}
+$else$
+\journalname{Enter journal name here}
+$endif$
+
+
+
+\begin{document}
+
+$if(title)$
+\title{$title$}
+$else$
+\title{==Enter your title here==}
+$endif$
+
+$if(author)$
+\authors{$author$}
+$else$
+\authors{=list all authors here=}
+$endif$
+
+$if(institute)$
+$for(institute/pairs)$
+\affiliation{$it.key$}{$it.value$}
+$endfor$
+$else$
+$if(affiliation)$
+$for(affiliation)$
+\affiliation{$affiliation.id$}{$affiliation.name$}
+$endfor$
+$else$
+\affiliation{=number=}{=Affiliation Address=}
+$endif$
+$endif$
+
+$if(corr_author)$
+$if(corr_author_email)$
+\correspondingauthor{$corr_author$}{$corr_author_email$}
+$endif$
+$endif$
+
+
+\begin{keypoints}
+$if(keypoints)$
+$for(keypoints)$
+\item $keypoints$$seq$
+$endfor$
+$else$
+\item enter point 1 here
+\item enter point 2 here
+\item enter point 3 here
+$endif$
+\end{keypoints}
+
+
+
+\begin{abstract}
+$if(abstract)$
+$abstract$
+$else$
+[ enter your Abstract here ]
+$endif$
+\end{abstract}
+
+\section*{Plain Language Summary}
+$if(plain_lang)$
+$plain_lang$
+$else$
+[ enter your Plain Language Summary here or delete this section]
+$endif$
+
+
+$body$
+
+
+\acknowledgments
+$if(acknowledgements)$
+$acknowledgements$
+$else$
+Enter acknowledgments, including your data availability statement, here.
+$endif$
+
+
+
+\bibliography{$if(bibilography)$$biliography$$else$ enter your bibtex bibliography filename here $endif$}
+
+
+\end{document}
+
+
+
+More Information and Advice:
+
+
+Math coded inside display math mode \[ ...\]
+ will not be numbered, e.g.,:
+ \[ x^2=y^2 + z^2\]
+
+ Math coded inside \begin{equation} and \end{equation} will
+ be automatically numbered, e.g.,:
+ \begin{equation}
+ x^2=y^2 + z^2
+ \end{equation}
+
+
+\begin{eqnarray}
+  x_{1} & = & (x - x_{0}) \cos \Theta \nonumber \\
+        && + (y - y_{0}) \sin \Theta  \nonumber \\
+  y_{1} & = & -(x - x_{0}) \sin \Theta \nonumber \\
+        && + (y - y_{0}) \cos \Theta.
+\end{eqnarray}
