@@ -18,12 +18,11 @@ parser.add_argument('mdfile',
 parser.add_argument('-f', '--force', action='store_true',
         default=False, dest='force',
         help='Overwrite output files if they alreday exist')
+parser.add_argument('--bibliography', dest='bib',
+        help='Bibliography in bibtext format')
+#parser.add_argument('--csl', dest='csl',
+#        help='Citation format file')
 args = parser.parse_args()
-
-#if not args.mdfile:
-#    print(' Error: One and only one Markdown file should be given')
-#    print(usage)
-#    sys.exit()
 
 # check if the input Markdown file is in current folder
 mdfile = args.mdfile
@@ -39,6 +38,13 @@ fn_name, fn_ext = os.path.splitext(fn)
 
 pdf_fn = fn_name + '.pdf'
 docx_fn = fn_name + '.docx'
+
+citation_flags = []
+citation_flags.append('--csl=agu.csl')
+if args.bib is not None:
+    citation_flags.append('--bibliography=%s' % args.bib)
+    citation_flags.append('--citeproc')
+citation_flags = ' '.join(citation_flags)
 
 if not args.force:
     i = 1
@@ -57,28 +63,38 @@ if not args.force:
         docx_fn = new_docx_fn
         i += 1
 
-
-
 shutil.copy(pkg_file('data/agujournal2019.cls'), os.getcwd())
 shutil.copy(pkg_file('data/trackchanges.sty'), os.getcwd())
 shutil.copy(pkg_file('data/agu-docx.tex'), os.getcwd())
 shutil.copy(pkg_file('data/agutemplate.tex'), os.getcwd())
 shutil.copy(pkg_file('data/agu-reference.docx'), os.getcwd())
+shutil.copy(pkg_file('data/agu.csl'), os.getcwd())
 
-call(("pandoc %s --template=%s "
-    "--pdf-engine=xelatex --o %s") % (mdfile, 'agutemplate.tex', pdf_fn),
+# Convert to pdf
+print(("pandoc -s %s --template=%s "
+    "--pdf-engine=xelatex %s -o %s") % (mdfile, 'agutemplate.tex', citation_flags, pdf_fn),
+    )
+call(("pandoc -s %s --template=%s "
+    " %s -o %s") % (mdfile, 'agutemplate.tex', citation_flags, pdf_fn),
     shell=True)
 
 if os.path.isfile(pdf_fn):
     print(pdf_fn)
 
-call(("pandoc %s --template=%s "
-    "-o test_docx.tex") % (mdfile, 'agu-docx.tex'),
+# Convert to docx
+print(("pandoc %s --template=%s %s "
+    "-o test_docx.tex") % (mdfile, 'agu-docx.tex', citation_flags),
+    )
+call(("pandoc %s --template=%s %s "
+    "-o test_docx.tex") % (mdfile, 'agu-docx.tex', citation_flags),
     shell=True)
 
+print(("pandoc test_docx.tex "
+    "--reference-doc=%s %s "
+    "-o %s") % ('agu-reference.docx', citation_flags, docx_fn))
 call(("pandoc test_docx.tex "
-    "--reference-doc=%s "
-    "-o %s") % ('agu-reference.docx', docx_fn), shell=True)
+    "--reference-doc=%s %s "
+    "-o %s") % ('agu-reference.docx', citation_flags, docx_fn), shell=True)
 
 if os.path.isfile(docx_fn):
     print(docx_fn)
